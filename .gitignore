@@ -1,12 +1,16 @@
+# =========================
 # Python
+# =========================
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+
+# Packaging and build artifacts
 build/
-develop-eggs/
 dist/
+develop-eggs/
 downloads/
 eggs/
 .eggs/
@@ -20,37 +24,58 @@ wheels/
 .installed.cfg
 *.egg
 
-# PyTorch
-*.pt
-*.pth
-
-# Results and outputs
-results/
-*.npz
-*.png
-*.jpg
-*.jpeg
-
-# Jupyter Notebook
+# =========================
+# Jupyter
+# =========================
 .ipynb_checkpoints/
 
-# Environment
+# =========================
+# Virtual environments
+# =========================
 .env
 .venv
 env/
 venv/
 ENV/
 
-# IDE
+# =========================
+# IDEs and editors
+# =========================
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
+# =========================
 # OS
+# =========================
 .DS_Store
 Thumbs.db
 
+# =========================
 # Logs
+# =========================
 *.log
+
+# =========================
+# Data and results
+# Keep plots and normal result files tracked
+# =========================
+
+# Keep binary arrays tracked if you use them for reproducible experiments
+# (remove these lines if you do NOT want to track such files)
+# *.npz
+
+# If you have huge raw datasets, ignore them by folder name
+# (edit folder names to match your repo)
+data_raw/
+datasets_raw/
+
+# =========================
+# ML models (usually large)
+# =========================
+# Keep these ignored by default to avoid huge pushes.
+# If you want to track them, use Git LFS instead of removing these lines.
+*.pt
+*.pth
