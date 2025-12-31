@@ -63,6 +63,9 @@ Thumbs.db
 # Keep plots and normal result files tracked
 # =========================
 
+# Ignore test results
+test_results/
+
 # Keep binary arrays tracked if you use them for reproducible experiments
 # (remove these lines if you do NOT want to track such files)
 # *.npz
