@@ -2,14 +2,20 @@
 
 A machine learning framework for optimizing Reconfigurable Intelligent Surface (RIS) phase configurations using limited probe measurements.
 
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-1.12+-red.svg)](https://pytorch.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 ## 🎯 Problem Overview
 
-In RIS-assisted wireless communications, we have:
+In RIS-assisted wireless communications:
 - **N** RIS elements (reflective surface) - default: 32
 - **K** pre-defined probe configurations (phase patterns) - default: 64
 - **M** sensing budget (probes we can actually measure) - default: 8
 
 **Challenge**: Predict the best probe among all K options while only observing M << K measurements.
+
+**Our Solution**: Train a neural network to learn patterns from limited observations and predict the optimal probe configuration.
 
 ## 🏗️ Architecture
 
@@ -28,51 +34,114 @@ The model uses a **Masked Vector Approach**:
 ## 📦 Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/mohbagher/Probe_Based_ML_Session5.git
+cd Probe_Based_ML_Session5
+
+# Install dependencies
 pip install -r requirements.txt
 ```
 
+### Dependencies
+- Python ≥ 3.8
+- PyTorch ≥ 1.12.0
+- NumPy ≥ 1.21.0
+- Matplotlib ≥ 3.5.0
+- Seaborn ≥ 0.11.0
+- SciPy ≥ 1.7.0
+- tqdm ≥ 4.62.0
+- pandas ≥ 1.3.0
+
 ## 🚀 Quick Start
 
-### Python API
-
-```python
-from run import run_default
-
-# Run with default parameters
-results = run_default()
-
-# Custom parameters
-from run import run_custom
-results = run_custom(N=64, K=128, M=16, n_train=100000)
-```
-
-### Command Line
+### Option 1: Interactive Menu (Recommended)
 
 ```bash
-python main.py --N 32 --K 64 --M 8 --n_train 50000 --epochs 100
+python experiment_runner.py
 ```
 
-## 💻 Command Line Arguments
+This opens an interactive menu where you can:
+- Select individual tasks (1-12)
+- Run all tasks (0)
+- Change parameters (S)
+- Custom task selection (99)
 
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `--N` | 32 | Number of RIS elements |
-| `--K` | 64 | Total probes in bank |
-| `--M` | 8 | Sensing budget (probes measured per sample) |
-| `--n_train` | 50000 | Number of training samples |
-| `--n_val` | 5000 | Number of validation samples |
-| `--n_test` | 5000 | Number of test samples |
-| `--epochs` | 100 | Maximum number of epochs |
-| `--batch_size` | 128 | Batch size |
-| `--lr` | 1e-3 | Learning rate |
-| `--hidden` | [512, 256, 128] | Hidden layer sizes |
-| `--dropout` | 0.1 | Dropout probability |
-| `--save_dir` | results | Directory to save results |
+### Option 2: Command Line
+
+```bash
+# Run specific tasks
+python experiment_runner.py --task 1,3,6 --N 32 --K 64 --M 8
+
+# Run all tasks
+python experiment_runner.py --task 0
+
+# Custom parameters
+python experiment_runner.py --task 4 --N 64 --K 128 --M 16 --seed 42
+```
+
+### Option 3: Python API
+
+```python
+from experiments.tasks.task_a1_binary import run_task_a1
+from experiments.tasks.task_b1_m_variation import run_task_b1
+
+# Run binary probe analysis
+result = run_task_a1(N=32, K=64, M=8, seed=42)
+
+# Run M variation study
+result = run_task_b1(N=32, K=64, M=8, seed=42)
+```
+
+### Option 4: Original Training Script
+
+```bash
+python main.py --N 32 --K 64 --M 8 --epochs 100
+```
+
+## 📋 Experiment Tasks
+
+The framework includes 12 organized research tasks:
+
+### Phase A: Probe Design
+| Task | Command | Description |
+|------|---------|-------------|
+| A1 | `--task 1` | Binary (1-bit) probe generation and analysis |
+| A2 | `--task 2` | Hadamard structured probe patterns |
+| A3 | `--task 3` | Probe diversity comparison across all types |
+
+### Phase B: Limited Probing Analysis
+| Task | Command | Description |
+|------|---------|-------------|
+| B1 | `--task 4` | M variation study (M ∈ {2,4,8,16,32}) |
+| B2 | `--task 5` | Top-m selection performance |
+| B3 | `--task 6` | ML vs baseline comparison |
+
+### Phase C: Scaling Study
+| Task | Command | Description |
+|------|---------|-------------|
+| C1 | `--task 7` | Scale K (number of probes) |
+| C2 | `--task 8` | Phase resolution comparison |
+
+### Phase D: Quality Control
+| Task | Command | Description |
+|------|---------|-------------|
+| D1 | `--task 9` | Seed variation (reproducibility) |
+| D2 | `--task 10` | Training sanity checks |
+
+### Phase E: Documentation
+| Task | Command | Description |
+|------|---------|-------------|
+| E1 | `--task 11` | Generate one-page summary |
+| E2 | `--task 12` | Generate comparison plots |
 
 ## 📊 Key Metrics
 
-- **η (eta)**: Power ratio = P_selected / P_best_probe (higher is better, max 1.0)
+- **η (eta)**: Power ratio = P_selected / P_best_probe
+  - η = 1.0 → Perfect (found the best probe)
+  - η = 0.5 → Selected probe gives half the optimal power
+
 - **Top-m Accuracy**: Fraction where oracle best probe is in top-m predictions
+
 - **Baselines**:
   - Random 1/K: Pick 1 probe randomly
   - Random M/K: Best of random M probes
@@ -82,67 +151,127 @@ python main.py --N 32 --K 64 --M 8 --n_train 50000 --epochs 100
 ## 📁 Project Structure
 
 ```
-├── config.py              # Configuration dataclasses
-├── data_generation.py     # Channel simulation & dataset creation
-├── model.py               # MLP neural network architecture
-├── training.py            # Training loop with early stopping
-├── evaluation.py          # Metrics computation & baselines
-├── utils.py               # Visualization & result saving
-├── main.py                # CLI entry point
-├── run.py                 # Quick experiment scripts
-├── experiment_runner.py   # 🆕 Interactive experiment framework
-├── experiments/           # 🆕 Comprehensive experiment suite
-│   ├── probe_generators.py    # Multiple probe types (continuous, binary, 2-bit, Hadamard)
-│   ├── diversity_analysis.py  # Probe diversity metrics
-│   └── tasks/                 # Individual experiment tasks (A1-E2)
-└── requirements.txt       # Dependencies
+Probe_Based_ML_Session5/
+├── experiment_runner.py      # 🎯 Main interactive experiment runner
+├── main.py                   # Original training script
+├── run.py                    # Quick experiment scripts
+│
+├── config.py                 # Configuration dataclasses
+├── model.py                  # MLP neural network architecture
+├── training.py               # Training loop with early stopping
+├── evaluation.py             # Metrics computation & baselines
+├── data_generation.py        # Channel simulation & datasets
+├── utils.py                  # Visualization & utilities
+│
+├── experiments/              # 🧪 Experiment framework
+│   ├── __init__.py
+│   ├── probe_generators.py   # All probe types (continuous, binary, Hadamard)
+│   ├── diversity_analysis.py # Diversity metrics
+│   └── tasks/                # Individual task implementations
+│       ├── task_a1_binary.py
+│       ├── task_a2_hadamard.py
+│       ├── task_a3_diversity.py
+│       ├── task_b1_m_variation.py
+│       ├── task_b2_top_m.py
+│       ├── task_b3_baselines.py
+│       └── ... (more tasks)
+│
+├── results/                  # 📈 Output directory (auto-created)
+│   ├── A1_binary_probes/
+│   ├── A2_hadamard_probes/
+│   ├── B1_M_variation/
+│   └── ...
+│
+├── EXPERIMENT_RUNNER.md      # Detailed experiment documentation
+├── IMPLEMENTATION_SUMMARY.md # Technical implementation details
+├── requirements.txt          # Dependencies
+├── LICENSE                   # MIT License
+└── README.md                 # This file
 ```
 
-## 🧪 Experiment Framework (NEW!)
+## 📈 Results Structure
 
-A comprehensive experiment framework is now available for running systematic studies on probe design, limited probing analysis, and scaling experiments.
+Each task saves results to its own folder:
 
-### Quick Start
-
-```bash
-# Interactive menu
-python experiment_runner.py
-
-# Run specific tasks via CLI
-python experiment_runner.py --task 1,2,3 --N 32 --K 64 --M 8
-
-# Run all experiments
-python experiment_runner.py --task all
+```
+results/
+├── A1_binary_probes/
+│   ├── plots/
+│   │   ├── phase_heatmap.png
+│   │   └── phase_histogram.png
+│   └── metrics.txt
+├── B1_M_variation/
+│   ├── plots/
+│   │   └── eta_vs_M.png
+│   └── metrics.txt
+└── comparison_all_models/
+    ├── master_comparison.png
+    └── summary.txt
 ```
 
-### Available Experiments
+## 🔬 Probe Types
 
-- **Phase A: Probe Design** - Binary, Hadamard, and diversity analysis
-- **Phase B: Limited Probing** - M variation, top-m selection, baselines
-- **Phase C: Scaling Study** - K variation and phase resolution
-- **Phase D: Quality Control** - Seed variation and sanity checks
-- **Phase E: Documentation** - Summary reports and comparison plots
+The framework supports 4 probe types:
 
-See [EXPERIMENT_RUNNER.md](EXPERIMENT_RUNNER.md) for detailed documentation.
+| Type | Phases | Description | Use Case |
+|------|--------|-------------|----------|
+| Continuous | [0, 2π) | Random phases | Baseline, theoretical limit |
+| Binary (1-bit) | {0, π} | Two-level quantization | Simple hardware |
+| 2-bit | {0, π/2, π, 3π/2} | Four-level quantization | Balanced complexity |
+| Hadamard | {0, π} structured | Orthogonal patterns | Maximum diversity |
 
-## 📚 Dependencies
+## 💻 Command Line Arguments
 
-- PyTorch ≥ 1.12.0
-- NumPy ≥ 1.21.0
-- Matplotlib ≥ 3.5.0
-- Seaborn ≥ 0.11.0
-- tqdm ≥ 4.62.0
-- pandas ≥ 1.3.0
-- scipy ≥ 1.7.0 🆕
+| Argument | Default | Description |
+|----------|---------|-------------|
+| `--task` | None | Task(s) to run (1-12, 0=all, or comma-separated) |
+| `--N` | 32 | Number of RIS elements |
+| `--K` | 64 | Total probes in bank |
+| `--M` | 8 | Sensing budget |
+| `--seed` | 42 | Random seed |
+| `--results-dir` | results | Base directory for outputs |
 
-## 📈 Example Results
+## 📚 Documentation
 
-After training, the model outputs:
-- Training history plots (loss, accuracy, η over epochs)
-- η distribution comparison (ML model vs baselines)
-- Top-m accuracy and power ratio bar charts
-- Saved model checkpoint and metrics
+- **[EXPERIMENT_RUNNER.md](EXPERIMENT_RUNNER.md)**: Complete guide to the experiment framework
+- **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)**: Technical implementation details
+
+## 🎓 For PhD Research
+
+### Recommended Experiment Sequence
+
+1. **Quick validation**: `python experiment_runner.py --task 1`
+2. **Probe design analysis**: `python experiment_runner.py --task 1,2,3`
+3. **Core ML experiments**: `python experiment_runner.py --task 4,5,6`
+4. **Full study**: `python experiment_runner.py --task 0`
+
+### Key Results for Publications
+
+- **η vs M curve**: Shows performance vs measurement overhead
+- **ML vs Baselines**: Demonstrates ML advantage
+- **Probe diversity**: Justifies structured probe design
+
+## 📄 Citation
+
+If you use this code in your research, please cite:
+
+```bibtex
+@software{ris_probe_ml,
+  author = {Bagher, Mohammad},
+  title = {RIS Probe-Based Control with Limited Probing},
+  year = {2024},
+  url = {https://github.com/mohbagher/Probe_Based_ML_Session5}
+}
+```
 
 ## 📄 License
 
-MIT License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📧 Contact
+
+For questions or collaboration, please open an issue on GitHub.
