@@ -82,16 +82,48 @@ python main.py --N 32 --K 64 --M 8 --n_train 50000 --epochs 100
 ## 📁 Project Structure
 
 ```
-├── config.py           # Configuration dataclasses
-├── data_generation.py  # Channel simulation &amp; dataset creation
-├── model.py            # MLP neural network architecture
-├── training.py         # Training loop with early stopping
-├── evaluation.py       # Metrics computation &amp; baselines
-├── utils.py            # Visualization &amp; result saving
-├── main.py             # CLI entry point
-├── run.py              # Quick experiment scripts
-└── requirements.txt    # Dependencies
+├── config.py              # Configuration dataclasses
+├── data_generation.py     # Channel simulation & dataset creation
+├── model.py               # MLP neural network architecture
+├── training.py            # Training loop with early stopping
+├── evaluation.py          # Metrics computation & baselines
+├── utils.py               # Visualization & result saving
+├── main.py                # CLI entry point
+├── run.py                 # Quick experiment scripts
+├── experiment_runner.py   # 🆕 Interactive experiment framework
+├── experiments/           # 🆕 Comprehensive experiment suite
+│   ├── probe_generators.py    # Multiple probe types (continuous, binary, 2-bit, Hadamard)
+│   ├── diversity_analysis.py  # Probe diversity metrics
+│   └── tasks/                 # Individual experiment tasks (A1-E2)
+└── requirements.txt       # Dependencies
 ```
+
+## 🧪 Experiment Framework (NEW!)
+
+A comprehensive experiment framework is now available for running systematic studies on probe design, limited probing analysis, and scaling experiments.
+
+### Quick Start
+
+```bash
+# Interactive menu
+python experiment_runner.py
+
+# Run specific tasks via CLI
+python experiment_runner.py --task 1,2,3 --N 32 --K 64 --M 8
+
+# Run all experiments
+python experiment_runner.py --task all
+```
+
+### Available Experiments
+
+- **Phase A: Probe Design** - Binary, Hadamard, and diversity analysis
+- **Phase B: Limited Probing** - M variation, top-m selection, baselines
+- **Phase C: Scaling Study** - K variation and phase resolution
+- **Phase D: Quality Control** - Seed variation and sanity checks
+- **Phase E: Documentation** - Summary reports and comparison plots
+
+See [EXPERIMENT_RUNNER.md](EXPERIMENT_RUNNER.md) for detailed documentation.
 
 ## 📚 Dependencies
 
@@ -101,6 +133,7 @@ python main.py --N 32 --K 64 --M 8 --n_train 50000 --epochs 100
 - Seaborn ≥ 0.11.0
 - tqdm ≥ 4.62.0
 - pandas ≥ 1.3.0
+- scipy ≥ 1.7.0 🆕
 
 ## 📈 Example Results
 
