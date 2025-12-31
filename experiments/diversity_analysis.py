@@ -26,24 +26,18 @@ def compute_cosine_similarity_matrix(probe_bank: ProbeBank) -> np.ndarray:
         Similarity matrix of shape (K, K)
     """
     K = probe_bank.K
+    N = probe_bank.N
     phases = probe_bank.phases
     
-    # Compute dot products
-    similarity_matrix = np.zeros((K, K))
+    # Convert to complex representation: exp(j*θ)
+    complex_vectors = np.exp(1j * phases)  # Shape: (K, N)
     
-    for i in range(K):
-        for j in range(K):
-            # Cosine similarity based on phase vectors
-            # We use the complex representation for better similarity measure
-            v1 = np.exp(1j * phases[i])
-            v2 = np.exp(1j * phases[j])
-            
-            # Inner product of complex vectors
-            inner_prod = np.abs(np.dot(v1.conj(), v2))
-            
-            # Normalize by magnitudes (both are N)
-            similarity = inner_prod / probe_bank.N
-            similarity_matrix[i, j] = similarity
+    # Compute all pairwise inner products using matrix multiplication
+    # Inner product: v1^H * v2 (conjugate transpose of v1 times v2)
+    inner_products = np.abs(complex_vectors @ complex_vectors.conj().T)
+    
+    # Normalize by N (since all vectors have the same magnitude sqrt(N))
+    similarity_matrix = inner_products / N
     
     return similarity_matrix
 
@@ -65,21 +59,26 @@ def compute_hamming_distance_matrix(probe_bank: ProbeBank) -> np.ndarray:
     N = probe_bank.N
     phases = probe_bank.phases
     
-    distance_matrix = np.zeros((K, K))
-    
     # Tolerance for comparing floating point phases
     tol = 1e-6
     
-    for i in range(K):
-        for j in range(K):
-            # Count positions where phases differ
-            diff = np.abs(phases[i] - phases[j])
-            # Account for wrap-around (2π = 0)
-            diff = np.minimum(diff, 2*np.pi - diff)
-            # Count as different if difference > tolerance
-            num_different = np.sum(diff > tol)
-            # Normalize by N
-            distance_matrix[i, j] = num_different / N
+    # Vectorized computation
+    # Expand phases to compute all pairwise differences
+    # phases[i, :] - phases[j, :] for all i, j
+    phases_i = phases[:, np.newaxis, :]  # Shape: (K, 1, N)
+    phases_j = phases[np.newaxis, :, :]  # Shape: (1, K, N)
+    
+    # Compute absolute differences
+    diff = np.abs(phases_i - phases_j)  # Shape: (K, K, N)
+    
+    # Account for wrap-around (2π = 0)
+    diff = np.minimum(diff, 2*np.pi - diff)
+    
+    # Count positions where difference > tolerance
+    different = (diff > tol).sum(axis=2)  # Shape: (K, K)
+    
+    # Normalize by N
+    distance_matrix = different / N
     
     return distance_matrix
 
