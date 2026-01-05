@@ -15,10 +15,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from experiments.probe_generators import generate_probe_bank_halton, generate_probe_bank_continuous
-from experiments.diversity_analysis import (
-    compute_cosine_similarity_matrix,
-    compute_diversity_metrics
-)
+from experiments.diversity_analysis import compute_diversity_metrics
 
 
 def run_task_a5(N: int = 32, K: int = 64, M: int = 8, seed: int = 42,
@@ -60,13 +57,6 @@ def run_task_a5(N: int = 32, K: int = 64, M: int = 8, seed: int = 42,
         print("Computing diversity metrics...")
     halton_metrics = compute_diversity_metrics(halton_bank)
     continuous_metrics = compute_diversity_metrics(continuous_bank)
-
-    # Compute cosine similarity distributions
-    halton_similarity = compute_cosine_similarity_matrix(halton_bank)
-    continuous_similarity = compute_cosine_similarity_matrix(continuous_bank)
-    mask = np.triu(np.ones((K, K), dtype=bool), k=1)
-    halton_values = halton_similarity[mask]
-    continuous_values = continuous_similarity[mask]
 
     # Create phase heatmap comparison
     if verbose:
@@ -128,42 +118,6 @@ def run_task_a5(N: int = 32, K: int = 64, M: int = 8, seed: int = 42,
         print(f"  Saved: {histogram_path}")
     plt.close()
 
-    # Create pairwise similarity comparison
-    if verbose:
-        print("Creating pairwise similarity comparison...")
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-
-    ax = axes[0]
-    ax.hist(halton_values, bins=40, color='steelblue', alpha=0.7,
-            edgecolor='black', label=f'Halton (mean={np.mean(halton_values):.3f})')
-    ax.hist(continuous_values, bins=40, color='coral', alpha=0.5,
-            edgecolor='black', label=f'Continuous (mean={np.mean(continuous_values):.3f})')
-    ax.set_xlabel('Cosine Similarity')
-    ax.set_ylabel('Count')
-    ax.set_title('Pairwise Cosine Similarity Distribution')
-    ax.legend()
-    ax.grid(True, alpha=0.3)
-
-    ax = axes[1]
-    halton_sorted = np.sort(halton_values)
-    continuous_sorted = np.sort(continuous_values)
-    halton_cdf = np.arange(1, len(halton_sorted) + 1) / len(halton_sorted)
-    continuous_cdf = np.arange(1, len(continuous_sorted) + 1) / len(continuous_sorted)
-    ax.plot(halton_sorted, halton_cdf, color='steelblue', linewidth=2, label='Halton')
-    ax.plot(continuous_sorted, continuous_cdf, color='coral', linewidth=2, label='Continuous')
-    ax.set_xlabel('Cosine Similarity')
-    ax.set_ylabel('CDF')
-    ax.set_title('Cumulative Distribution')
-    ax.legend()
-    ax.grid(True, alpha=0.3)
-
-    plt.tight_layout()
-    similarity_path = os.path.join(plots_dir, "pairwise_similarity.png")
-    plt.savefig(similarity_path, dpi=150, bbox_inches='tight')
-    if verbose:
-        print(f"  Saved: {similarity_path}")
-    plt.close()
-
     # Save metrics
     metrics_path = os.path.join(results_dir, "metrics.txt")
     with open(metrics_path, 'w') as f:
@@ -196,6 +150,6 @@ def run_task_a5(N: int = 32, K: int = 64, M: int = 8, seed: int = 42,
         'continuous_bank': continuous_bank,
         'halton_metrics': halton_metrics,
         'continuous_metrics': continuous_metrics,
-        'plots': [heatmap_path, histogram_path, similarity_path],
+        'plots': [heatmap_path, histogram_path],
         'metrics_file': metrics_path
     }

@@ -174,14 +174,12 @@ results/
 ├── A4_sobol_probes/
 │   ├── plots/
 │   │   ├── phase_heatmap.png
-│   │   ├── phase_histogram.png
-│   │   └── pairwise_similarity.png
+│   │   └── phase_histogram.png
 │   └── metrics.txt
 ├── A5_halton_probes/
 │   ├── plots/
 │   │   ├── phase_heatmap.png
-│   │   ├── phase_histogram.png
-│   │   └── pairwise_similarity.png
+│   │   └── phase_histogram.png
 │   └── metrics.txt
 ... (similar structure for all tasks)
 ```
@@ -284,10 +282,10 @@ The framework is production-ready and can be used immediately for systematic res
 - Generates Sobol low-discrepancy probes
 - Creates phase heatmaps and histograms
 - Computes diversity metrics
-- Outputs: 3 plots + metrics.txt
+- Outputs: 2 plots + metrics.txt
 
 **Task A5 - Halton Probes** (`task_a5_halton.py`)
 - Generates Halton low-discrepancy probes
 - Creates phase heatmaps and histograms
 - Computes diversity metrics
-- Outputs: 3 plots + metrics.txt
+- Outputs: 2 plots + metrics.txt

@@ -103,7 +103,6 @@ python experiment_runner.py --task 6 --N 64 --K 128 --M 32 --seed 123
 **Outputs:**
 - `results/A4_sobol_probes/plots/phase_heatmap.png`
 - `results/A4_sobol_probes/plots/phase_histogram.png`
-- `results/A4_sobol_probes/plots/pairwise_similarity.png`
 - `results/A4_sobol_probes/metrics.txt`
 
 #### Task 5: A5 - Halton Probes
@@ -115,7 +114,6 @@ python experiment_runner.py --task 6 --N 64 --K 128 --M 32 --seed 123
 **Outputs:**
 - `results/A5_halton_probes/plots/phase_heatmap.png`
 - `results/A5_halton_probes/plots/phase_histogram.png`
-- `results/A5_halton_probes/plots/pairwise_similarity.png`
 - `results/A5_halton_probes/metrics.txt`
 
 ### Phase B: Limited Probing Analysis
