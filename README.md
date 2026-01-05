@@ -61,7 +61,7 @@ python experiment_runner.py
 ```
 
 This opens an interactive menu where you can:
-- Select individual tasks (1-12)
+- Select individual tasks (1-14)
 - Run all tasks (0)
 - Change parameters (S)
 - Custom task selection (99)
@@ -76,7 +76,7 @@ python experiment_runner.py --task 1,3,6 --N 32 --K 64 --M 8
 python experiment_runner.py --task 0
 
 # Custom parameters
-python experiment_runner.py --task 4 --N 64 --K 128 --M 16 --seed 42
+python experiment_runner.py --task 6 --N 64 --K 128 --M 16 --seed 42
 ```
 
 ### Option 3: Python API
@@ -100,7 +100,7 @@ python main.py --N 32 --K 64 --M 8 --epochs 100
 
 ## 📋 Experiment Tasks
 
-The framework includes 12 organized research tasks:
+The framework includes 14 organized research tasks:
 
 ### Phase A: Probe Design
 | Task | Command | Description |
@@ -108,31 +108,33 @@ The framework includes 12 organized research tasks:
 | A1 | `--task 1` | Binary (1-bit) probe generation and analysis |
 | A2 | `--task 2` | Hadamard structured probe patterns |
 | A3 | `--task 3` | Probe diversity comparison across all types |
+| A4 | `--task 4` | Sobol low-discrepancy probe analysis |
+| A5 | `--task 5` | Halton low-discrepancy probe analysis |
 
 ### Phase B: Limited Probing Analysis
 | Task | Command | Description |
 |------|---------|-------------|
-| B1 | `--task 4` | M variation study (M ∈ {2,4,8,16,32}) |
-| B2 | `--task 5` | Top-m selection performance |
-| B3 | `--task 6` | ML vs baseline comparison |
+| B1 | `--task 6` | M variation study (M ∈ {2,4,8,16,32}) |
+| B2 | `--task 7` | Top-m selection performance |
+| B3 | `--task 8` | ML vs baseline comparison |
 
 ### Phase C: Scaling Study
 | Task | Command | Description |
 |------|---------|-------------|
-| C1 | `--task 7` | Scale K (number of probes) |
-| C2 | `--task 8` | Phase resolution comparison |
+| C1 | `--task 9` | Scale K (number of probes) |
+| C2 | `--task 10` | Phase resolution comparison |
 
 ### Phase D: Quality Control
 | Task | Command | Description |
 |------|---------|-------------|
-| D1 | `--task 9` | Seed variation (reproducibility) |
-| D2 | `--task 10` | Training sanity checks |
+| D1 | `--task 11` | Seed variation (reproducibility) |
+| D2 | `--task 12` | Training sanity checks |
 
 ### Phase E: Documentation
 | Task | Command | Description |
 |------|---------|-------------|
-| E1 | `--task 11` | Generate one-page summary |
-| E2 | `--task 12` | Generate comparison plots |
+| E1 | `--task 13` | Generate one-page summary |
+| E2 | `--task 14` | Generate comparison plots |
 
 ## 📊 Key Metrics
 
@@ -171,6 +173,8 @@ Probe_Based_ML_Session5/
 │       ├── task_a1_binary.py
 │       ├── task_a2_hadamard.py
 │       ├── task_a3_diversity.py
+│       ├── task_a4_sobol.py
+│       ├── task_a5_halton.py
 │       ├── task_b1_m_variation.py
 │       ├── task_b2_top_m.py
 │       ├── task_b3_baselines.py
@@ -219,12 +223,14 @@ The framework supports 4 probe types:
 | Binary (1-bit) | {0, π} | Two-level quantization | Simple hardware |
 | 2-bit | {0, π/2, π, 3π/2} | Four-level quantization | Balanced complexity |
 | Hadamard | {0, π} structured | Orthogonal patterns | Maximum diversity |
+| Sobol | [0, 2π) low-discrepancy | Quasi-random coverage | Uniform space-filling |
+| Halton | [0, 2π) low-discrepancy | Quasi-random coverage | Uniform space-filling |
 
 ## 💻 Command Line Arguments
 
 | Argument | Default | Description |
 |----------|---------|-------------|
-| `--task` | None | Task(s) to run (1-12, 0=all, or comma-separated) |
+| `--task` | None | Task(s) to run (1-14, 0=all, or comma-separated) |
 | `--N` | 32 | Number of RIS elements |
 | `--K` | 64 | Total probes in bank |
 | `--M` | 8 | Sensing budget |
@@ -241,8 +247,8 @@ The framework supports 4 probe types:
 ### Recommended Experiment Sequence
 
 1. **Quick validation**: `python experiment_runner.py --task 1`
-2. **Probe design analysis**: `python experiment_runner.py --task 1,2,3`
-3. **Core ML experiments**: `python experiment_runner.py --task 4,5,6`
+2. **Probe design analysis**: `python experiment_runner.py --task 1,2,3,4,5`
+3. **Core ML experiments**: `python experiment_runner.py --task 6,7,8`
 4. **Full study**: `python experiment_runner.py --task 0`
 
 ### Key Results for Publications

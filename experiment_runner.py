@@ -15,6 +15,8 @@ sys.path.append(os.path.dirname(__file__))
 from experiments.tasks.task_a1_binary import run_task_a1
 from experiments.tasks.task_a2_hadamard import run_task_a2
 from experiments.tasks.task_a3_diversity import run_task_a3
+from experiments.tasks.task_a4_sobol import run_task_a4
+from experiments.tasks.task_a5_halton import run_task_a5
 from experiments.tasks.task_b1_m_variation import run_task_b1
 from experiments.tasks.task_b2_top_m import run_task_b2
 from experiments.tasks.task_b3_baselines import run_task_b3
@@ -31,15 +33,17 @@ TASKS = {
     1: {'name': 'A1: Binary Probes', 'func': run_task_a1, 'phase': 'A'},
     2: {'name': 'A2: Hadamard Probes', 'func': run_task_a2, 'phase': 'A'},
     3: {'name': 'A3: Probe Diversity Analysis', 'func': run_task_a3, 'phase': 'A'},
-    4: {'name': 'B1: M Variation Study', 'func': run_task_b1, 'phase': 'B'},
-    5: {'name': 'B2: Top-m Selection', 'func': run_task_b2, 'phase': 'B'},
-    6: {'name': 'B3: Baseline Comparison', 'func': run_task_b3, 'phase': 'B'},
-    7: {'name': 'C1: Scale K', 'func': run_task_c1, 'phase': 'C'},
-    8: {'name': 'C2: Phase Resolution', 'func': run_task_c2, 'phase': 'C'},
-    9: {'name': 'D1: Seed Variation', 'func': run_task_d1, 'phase': 'D'},
-    10: {'name': 'D2: Sanity Checks', 'func': run_task_d2, 'phase': 'D'},
-    11: {'name': 'E1: Summary', 'func': run_task_e1, 'phase': 'E'},
-    12: {'name': 'E2: Comparison Plots', 'func': run_task_e2, 'phase': 'E'},
+    4: {'name': 'A4: Sobol Probes', 'func': run_task_a4, 'phase': 'A'},
+    5: {'name': 'A5: Halton Probes', 'func': run_task_a5, 'phase': 'A'},
+    6: {'name': 'B1: M Variation Study', 'func': run_task_b1, 'phase': 'B'},
+    7: {'name': 'B2: Top-m Selection', 'func': run_task_b2, 'phase': 'B'},
+    8: {'name': 'B3: Baseline Comparison', 'func': run_task_b3, 'phase': 'B'},
+    9: {'name': 'C1: Scale K', 'func': run_task_c1, 'phase': 'C'},
+    10: {'name': 'C2: Phase Resolution', 'func': run_task_c2, 'phase': 'C'},
+    11: {'name': 'D1: Seed Variation', 'func': run_task_d1, 'phase': 'D'},
+    12: {'name': 'D2: Sanity Checks', 'func': run_task_d2, 'phase': 'D'},
+    13: {'name': 'E1: Summary', 'func': run_task_e1, 'phase': 'E'},
+    14: {'name': 'E2: Comparison Plots', 'func': run_task_e2, 'phase': 'E'},
 }
 
 
@@ -68,19 +72,21 @@ def print_menu(settings: ExperimentSettings):
     print("║    [1] A1: Binary Probes                                             ║")
     print("║    [2] A2: Hadamard Probes                                           ║")
     print("║    [3] A3: Probe Diversity Analysis                                  ║")
+    print("║    [4] A4: Sobol Probes                                              ║")
+    print("║    [5] A5: Halton Probes                                             ║")
     print("║  PHASE B: Limited Probing Analysis                                   ║")
-    print("║    [4] B1: M Variation Study                                         ║")
-    print("║    [5] B2: Top-m Selection                                           ║")
-    print("║    [6] B3: Baseline Comparison                                       ║")
+    print("║    [6] B1: M Variation Study                                         ║")
+    print("║    [7] B2: Top-m Selection                                           ║")
+    print("║    [8] B3: Baseline Comparison                                       ║")
     print("║  PHASE C: Scaling Study                                              ║")
-    print("║    [7] C1: Scale K                                                   ║")
-    print("║    [8] C2: Phase Resolution                                          ║")
+    print("║    [9] C1: Scale K                                                   ║")
+    print("║    [10] C2: Phase Resolution                                         ║")
     print("║  PHASE D: Quality Control                                            ║")
-    print("║    [9] D1: Seed Variation                                            ║")
-    print("║    [10] D2: Sanity Checks                                            ║")
+    print("║    [11] D1: Seed Variation                                           ║")
+    print("║    [12] D2: Sanity Checks                                            ║")
     print("║  PHASE E: Documentation                                              ║")
-    print("║    [11] E1: Summary                                                  ║")
-    print("║    [12] E2: Comparison Plots                                         ║")
+    print("║    [13] E1: Summary                                                  ║")
+    print("║    [14] E2: Comparison Plots                                         ║")
     print("╠══════════════════════════════════════════════════════════════════════╣")
     print("║  [0] Run ALL Tasks                                                   ║")
     print("║  [99] Custom Selection (e.g., '1,4,6')                               ║")
@@ -223,10 +229,10 @@ def interactive_mode():
             run_custom_selection(settings)
         elif choice.isdigit():
             task_id = int(choice)
-            if 1 <= task_id <= 12:
+            if 1 <= task_id <= 14:
                 run_task(task_id, settings)
             else:
-                print("Invalid task number. Please choose 1-12.")
+                print("Invalid task number. Please choose 1-14.")
         else:
             print("Invalid choice. Please try again.")
 
