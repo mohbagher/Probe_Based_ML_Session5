@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Experiment Runner provides an interactive menu system and CLI interface for running comprehensive experiments on the RIS probe-based ML system. It includes 12 different tasks organized into 5 phases:
+The Experiment Runner provides an interactive menu system and CLI interface for running comprehensive experiments on the RIS probe-based ML system. It includes 14 different tasks organized into 5 phases:
 
 - **Phase A: Probe Design** - Analyzing different probe types (binary, Hadamard, diversity)
 - **Phase B: Limited Probing Analysis** - M variation, top-m selection, baseline comparisons
@@ -51,7 +51,7 @@ python experiment_runner.py --task 1,3,6 --N 32 --K 64 --M 8
 python experiment_runner.py --task all --N 64 --K 128 --M 16
 
 # Custom configuration
-python experiment_runner.py --task 4 --N 64 --K 128 --M 32 --seed 123
+python experiment_runner.py --task 6 --N 64 --K 128 --M 32 --seed 123
 ```
 
 ## Task Descriptions
@@ -94,9 +94,33 @@ python experiment_runner.py --task 4 --N 64 --K 128 --M 32 --seed 123
 - `results/A3_diversity_analysis/plots/phase_distributions.png`
 - `results/A3_diversity_analysis/metrics.txt`
 
+#### Task 4: A4 - Sobol Probes
+- Generates Sobol low-discrepancy probes
+- Compares with continuous random probes
+- Creates phase heatmaps and histograms
+- Computes diversity metrics
+
+**Outputs:**
+- `results/A4_sobol_probes/plots/phase_heatmap.png`
+- `results/A4_sobol_probes/plots/phase_histogram.png`
+- `results/A4_sobol_probes/plots/pairwise_similarity.png`
+- `results/A4_sobol_probes/metrics.txt`
+
+#### Task 5: A5 - Halton Probes
+- Generates Halton low-discrepancy probes
+- Compares with continuous random probes
+- Creates phase heatmaps and histograms
+- Computes diversity metrics
+
+**Outputs:**
+- `results/A5_halton_probes/plots/phase_heatmap.png`
+- `results/A5_halton_probes/plots/phase_histogram.png`
+- `results/A5_halton_probes/plots/pairwise_similarity.png`
+- `results/A5_halton_probes/metrics.txt`
+
 ### Phase B: Limited Probing Analysis
 
-#### Task 4: B1 - M Variation Study
+#### Task 6: B1 - M Variation Study
 - Tests different sensing budgets: M ∈ {2, 4, 8, 16, 32}
 - Trains ML model for each M value
 - Plots η (power ratio) vs M
@@ -109,7 +133,7 @@ python experiment_runner.py --task 4 --N 64 --K 128 --M 32 --seed 123
 
 **Note:** This task trains multiple models and takes longer to run.
 
-#### Task 5: B2 - Top-m Selection
+#### Task 7: B2 - Top-m Selection
 - Evaluates Top-1, 2, 4, 8 performance
 - Plots η vs top-m curves
 - Creates accuracy comparison
@@ -120,7 +144,7 @@ python experiment_runner.py --task 4 --N 64 --K 128 --M 32 --seed 123
 - `results/B2_top_m_selection/plots/top_m_summary_table.png`
 - `results/B2_top_m_selection/metrics.txt`
 
-#### Task 6: B3 - Baseline Comparison
+#### Task 8: B3 - Baseline Comparison
 - Implements baselines: Random 1/K, Random M/K, Best Observed
 - Trains ML model
 - Creates bar plot comparing ML vs all baselines
@@ -132,38 +156,54 @@ python experiment_runner.py --task 4 --N 64 --K 128 --M 32 --seed 123
 
 ### Phase C: Scaling Study
 
-#### Task 7: C1 - Scale K (Placeholder)
-- Tests K = 32, 64, 128
-- Plots η vs K for fixed M/K ratio
-- (Full implementation coming soon)
+#### Task 9: C1 - Scale K
+- Tests K = 32, 64, 128, 256 with fixed M (clipped when M > K)
+- Plots η vs K and η vs M/K ratio
+- Reports recommended K range based on performance trend
 
-#### Task 8: C2 - Phase Resolution (Placeholder)
-- Compares continuous, 1-bit, 2-bit, Hadamard
-- Summary plot of best η for each type vs M
-- (Full implementation coming soon)
+**Outputs:**
+- `results/C1_scale_k/plots/eta_vs_K.png`
+- `results/C1_scale_k/plots/eta_vs_M_over_K.png`
+- `results/C1_scale_k/metrics.txt`
+
+#### Task 10: C2 - Phase Resolution
+- Compares continuous, 1-bit, 2-bit, Hadamard probes
+- Plots η vs M for each type
+- Compares performance vs control bits at a fixed M
+
+**Outputs:**
+- `results/C2_phase_resolution/plots/eta_vs_M.png`
+- `results/C2_phase_resolution/plots/eta_vs_control_bits.png`
+- `results/C2_phase_resolution/metrics.txt`
 
 ### Phase D: Quality Control
 
-#### Task 9: D1 - Seed Variation (Placeholder)
+#### Task 11: D1 - Seed Variation
 - Trains with seeds 1, 2, 3, 4, 5
 - Creates boxplot of η distribution
 - Reports mean ± std
-- (Full implementation coming soon)
 
-#### Task 10: D2 - Sanity Checks (Placeholder)
+**Outputs:**
+- `results/D1_seed_variation/plots/eta_seed_boxplot.png`
+- `results/D1_seed_variation/metrics.txt`
+
+#### Task 12: D2 - Sanity Checks
 - Verifies training loss decreases
-- Verifies validation η increases
-- Flags any issues
-- (Full implementation coming soon)
+- Verifies validation η improves
+- Saves training curves and sanity flags
+
+**Outputs:**
+- `results/D2_sanity_checks/plots/training_history.png`
+- `results/D2_sanity_checks/metrics.txt`
 
 ### Phase E: Documentation
 
-#### Task 11: E1 - Summary (Placeholder)
+#### Task 13: E1 - Summary (Placeholder)
 - Generates one-page markdown summary
 - Includes key findings and figures
 - (Full implementation coming soon)
 
-#### Task 12: E2 - Comparison Plots (Placeholder)
+#### Task 14: E2 - Comparison Plots (Placeholder)
 - Generates master comparison figures
 - η vs M for all probe types
 - Top-m performance curves
@@ -172,7 +212,7 @@ python experiment_runner.py --task 4 --N 64 --K 128 --M 32 --seed 123
 ## Command-Line Options
 
 ```
---task TASK     Task number(s) to run (e.g., "1" or "1,4,6" or "all")
+--task TASK     Task number(s) to run (e.g., "1" or "1,6,8" or "all")
                 If not specified, runs in interactive mode
 --N N           Number of RIS elements (default: 32)
 --K K           Total number of probes in bank (default: 64)
@@ -198,6 +238,12 @@ results/
 │   ├── plots/
 │   ├── diversity_summary.csv
 │   └── metrics.txt
+├── A4_sobol_probes/
+│   ├── plots/
+│   └── metrics.txt
+├── A5_halton_probes/
+│   ├── plots/
+│   └── metrics.txt
 ├── B1_M_variation/
 │   ├── plots/
 │   └── metrics.txt
@@ -213,21 +259,21 @@ results/
 python experiment_runner.py --task 3 --N 8 --K 16 --M 4
 
 # Test baseline comparison (trains a model)
-python experiment_runner.py --task 6 --N 16 --K 32 --M 8
+python experiment_runner.py --task 8 --N 16 --K 32 --M 8
 ```
 
 ### Full Probe Analysis Suite
 
 ```bash
 # Run all Phase A tasks (probe design)
-python experiment_runner.py --task 1,2,3 --N 32 --K 64 --M 8
+python experiment_runner.py --task 1,2,3,4,5 --N 32 --K 64 --M 8
 ```
 
 ### M Variation Study
 
 ```bash
 # Test different sensing budgets
-python experiment_runner.py --task 4 --N 32 --K 64
+python experiment_runner.py --task 6 --N 32 --K 64
 # Will test M = 2, 4, 8, 16, 32 automatically
 ```
 
@@ -248,7 +294,9 @@ python experiment_runner.py --task all --N 64 --K 128 --M 16 --seed 123
 
 4. **Parallel Execution**: Currently tasks run sequentially. For parallel execution, run multiple CLI commands in different terminals.
 
-5. **Memory**: Large K values with full training datasets can use significant memory. Monitor system resources.
+5. **Auto-advance**: When running multiple tasks in sequence, the runner waits 5 seconds between tasks (press Enter to skip the wait).
+
+6. **Memory**: Large K values with full training datasets can use significant memory. Monitor system resources.
 
 ## Dependencies
 
