@@ -103,7 +103,6 @@ python experiment_runner.py --task 6 --N 64 --K 128 --M 32 --seed 123
 **Outputs:**
 - `results/A4_sobol_probes/plots/phase_heatmap.png`
 - `results/A4_sobol_probes/plots/phase_histogram.png`
-- `results/A4_sobol_probes/plots/pairwise_similarity.png`
 - `results/A4_sobol_probes/metrics.txt`
 
 #### Task 5: A5 - Halton Probes
@@ -115,7 +114,6 @@ python experiment_runner.py --task 6 --N 64 --K 128 --M 32 --seed 123
 **Outputs:**
 - `results/A5_halton_probes/plots/phase_heatmap.png`
 - `results/A5_halton_probes/plots/phase_histogram.png`
-- `results/A5_halton_probes/plots/pairwise_similarity.png`
 - `results/A5_halton_probes/metrics.txt`
 
 ### Phase B: Limited Probing Analysis
@@ -156,45 +154,29 @@ python experiment_runner.py --task 6 --N 64 --K 128 --M 32 --seed 123
 
 ### Phase C: Scaling Study
 
-#### Task 9: C1 - Scale K
-- Tests K = 32, 64, 128, 256 with fixed M (clipped when M > K)
-- Plots η vs K and η vs M/K ratio
-- Reports recommended K range based on performance trend
+#### Task 9: C1 - Scale K (Placeholder)
+- Tests K = 32, 64, 128
+- Plots η vs K for fixed M/K ratio
+- (Full implementation coming soon)
 
-**Outputs:**
-- `results/C1_scale_k/plots/eta_vs_K.png`
-- `results/C1_scale_k/plots/eta_vs_M_over_K.png`
-- `results/C1_scale_k/metrics.txt`
-
-#### Task 10: C2 - Phase Resolution
-- Compares continuous, 1-bit, 2-bit, Hadamard probes
-- Plots η vs M for each type
-- Compares performance vs control bits at a fixed M
-
-**Outputs:**
-- `results/C2_phase_resolution/plots/eta_vs_M.png`
-- `results/C2_phase_resolution/plots/eta_vs_control_bits.png`
-- `results/C2_phase_resolution/metrics.txt`
+#### Task 10: C2 - Phase Resolution (Placeholder)
+- Compares continuous, 1-bit, 2-bit, Hadamard
+- Summary plot of best η for each type vs M
+- (Full implementation coming soon)
 
 ### Phase D: Quality Control
 
-#### Task 11: D1 - Seed Variation
+#### Task 11: D1 - Seed Variation (Placeholder)
 - Trains with seeds 1, 2, 3, 4, 5
 - Creates boxplot of η distribution
 - Reports mean ± std
+- (Full implementation coming soon)
 
-**Outputs:**
-- `results/D1_seed_variation/plots/eta_seed_boxplot.png`
-- `results/D1_seed_variation/metrics.txt`
-
-#### Task 12: D2 - Sanity Checks
+#### Task 12: D2 - Sanity Checks (Placeholder)
 - Verifies training loss decreases
-- Verifies validation η improves
-- Saves training curves and sanity flags
-
-**Outputs:**
-- `results/D2_sanity_checks/plots/training_history.png`
-- `results/D2_sanity_checks/metrics.txt`
+- Verifies validation η increases
+- Flags any issues
+- (Full implementation coming soon)
 
 ### Phase E: Documentation
 
