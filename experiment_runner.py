@@ -6,8 +6,10 @@ related to probe design, limited probing analysis, scaling studies, etc.
 """
 
 import argparse
-import sys
 import os
+import select
+import sys
+import time
 
 # Add experiments to path
 sys.path.append(os.path.dirname(__file__))
@@ -174,7 +176,7 @@ def run_all_tasks(settings: ExperimentSettings):
         results[task_id] = result
         
         # Brief pause between tasks
-        input("\nPress Enter to continue to next task...")
+        wait_for_next_task()
     
     print("\n" + "="*70)
     print("ALL TASKS COMPLETED")
@@ -196,7 +198,7 @@ def run_custom_selection(settings: ExperimentSettings):
                 results[task_id] = result
                 
                 if len(task_ids) > 1:
-                    input("\nPress Enter to continue to next task...")
+                    wait_for_next_task()
             else:
                 print(f"Warning: Task {task_id} not found. Skipping.")
         
@@ -235,6 +237,18 @@ def interactive_mode():
                 print("Invalid task number. Please choose 1-14.")
         else:
             print("Invalid choice. Please try again.")
+
+
+def wait_for_next_task(timeout_seconds: int = 5):
+    """Wait for Enter or auto-advance after timeout."""
+    message = f"\nWaiting {timeout_seconds}s to continue (press Enter to skip)..."
+    print(message)
+    if not sys.stdin.isatty():
+        time.sleep(timeout_seconds)
+        return
+    ready, _, _ = select.select([sys.stdin], [], [], timeout_seconds)
+    if ready:
+        sys.stdin.readline()
 
 
 def cli_mode(args):

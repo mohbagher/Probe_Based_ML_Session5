@@ -98,6 +98,7 @@ These can be easily expanded following the existing pattern.
 - Run all tasks: `--task all`
 - Custom parameters: `--N 64 --K 128 --M 16 --seed 123`
 - Interactive mode: No arguments needed
+- Auto-advance: waits 5 seconds between sequential tasks (press Enter to skip)
 
 ### 4. Documentation ✅
 

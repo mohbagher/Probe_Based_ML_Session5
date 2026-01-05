@@ -276,7 +276,9 @@ python experiment_runner.py --task all --N 64 --K 128 --M 16 --seed 123
 
 4. **Parallel Execution**: Currently tasks run sequentially. For parallel execution, run multiple CLI commands in different terminals.
 
-5. **Memory**: Large K values with full training datasets can use significant memory. Monitor system resources.
+5. **Auto-advance**: When running multiple tasks in sequence, the runner waits 5 seconds between tasks (press Enter to skip the wait).
+
+6. **Memory**: Large K values with full training datasets can use significant memory. Monitor system resources.
 
 ## Dependencies
 

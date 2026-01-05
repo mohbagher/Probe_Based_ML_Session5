@@ -66,6 +66,8 @@ This opens an interactive menu where you can:
 - Change parameters (S)
 - Custom task selection (99)
 
+When running multiple tasks in sequence, the runner waits 5 seconds between tasks (press Enter to skip the wait).
+
 ### Option 2: Command Line
 
 ```bash
