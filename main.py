@@ -44,9 +44,7 @@ def run_experiment(config: Config, verbose: bool = True) -> dict:
         K=config.system.K,
         seed=config.data.seed,
         phase_mode=config.system.phase_mode,
-        phase_bits=config.system.phase_bits,
-        probe_bank_mode=config.system.probe_bank_mode,
-        qmc_scramble=config.system.qmc_scramble
+        phase_bits=config.system.phase_bits
     )
     
     if verbose:
@@ -169,11 +167,6 @@ def main():
                         help='Phase configuration mode')
     parser.add_argument('--phase_bits', type=int, default=3,
                         help='Phase quantization bits (discrete mode only)')
-    parser.add_argument('--probe_bank_mode', type=str, default='random',
-                        choices=['random', 'hadamard', 'sobol', 'halton'],
-                        help='Probe bank construction method')
-    parser.add_argument('--qmc_scramble', action=argparse.BooleanOptionalAction, default=True,
-                        help='Scramble Sobol/Halton sequences')
     
     # Data parameters
     parser.add_argument('--n_train', type=int, default=50000,
@@ -218,9 +211,7 @@ def main():
             'K': args.K,
             'M': args.M,
             'phase_mode': args.phase_mode,
-            'phase_bits': args.phase_bits,
-            'probe_bank_mode': args.probe_bank_mode,
-            'qmc_scramble': args.qmc_scramble
+            'phase_bits': args.phase_bits
         },
         data={
             'n_train': args.n_train,
