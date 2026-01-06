@@ -16,6 +16,10 @@ class SystemConfig:
     P_tx: float = 1.0              # Transmit power (normalized)
     sigma_h_sq: float = 1.0        # BS-RIS channel variance
     sigma_g_sq: float = 1.0        # RIS-UE channel variance
+    phase_mode: str = "continuous"  # "continuous" or "discrete"
+    phase_bits: int = 3            # Bits for discrete phase quantization
+    probe_bank_mode: str = "random"  # "random", "hadamard", "sobol", "halton"
+    qmc_scramble: bool = True      # Scramble Sobol/Halton sequences
 
 
 @dataclass
@@ -70,6 +74,13 @@ class Config:
         # Ensure M <= K
         if self.system.M > self.system.K:
             raise ValueError(f"M ({self.system.M}) cannot exceed K ({self.system.K})")
+        # Validate phase configuration
+        if self.system.phase_mode not in {"continuous", "discrete"}:
+            raise ValueError("phase_mode must be 'continuous' or 'discrete'")
+        if self.system.phase_mode == "discrete" and self.system.phase_bits <= 0:
+            raise ValueError("phase_bits must be > 0 when phase_mode is 'discrete'")
+        if self.system.probe_bank_mode not in {"random", "hadamard", "sobol", "halton"}:
+            raise ValueError("probe_bank_mode must be 'random', 'hadamard', 'sobol', or 'halton'")
     
     def print_config(self):
         """Print configuration summary."""
@@ -81,6 +92,12 @@ class Config:
         print(f"  K (total probes):     {self.system.K}")
         print(f"  M (sensing budget):   {self.system.M}")
         print(f"  M/K ratio:            {self.system.M/self.system.K:.2%}")
+        print(f"  Phase mode:           {self.system.phase_mode}")
+        if self.system.phase_mode == "discrete":
+            print(f"  Phase bits:           {self.system.phase_bits}")
+        print(f"  Probe bank mode:      {self.system.probe_bank_mode}")
+        if self.system.probe_bank_mode in {"sobol", "halton"}:
+            print(f"  QMC scramble:         {self.system.qmc_scramble}")
         print(f"\nData:")
         print(f"  Training samples:     {self.data.n_train}")
         print(f"  Validation samples:   {self.data.n_val}")

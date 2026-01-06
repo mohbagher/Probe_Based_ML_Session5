@@ -7,10 +7,13 @@ Key change from baseline:
 """
 
 import numpy as np
+import math
 from typing import Tuple, Dict, Optional
 from dataclasses import dataclass
 import torch
 from torch.utils.data import Dataset, DataLoader
+from scipy.stats import qmc
+from scipy.linalg import hadamard
 
 from config import Config, SystemConfig, DataConfig
 
@@ -27,7 +30,29 @@ class ProbeBank:
         return np.exp(1j * self.phases)
 
 
-def generate_probe_bank(N: int, K: int, seed: Optional[int] = None) -> ProbeBank:
+def _quantize_phases(phases: np.ndarray, phase_bits: int) -> np.ndarray:
+    levels = 2 ** phase_bits
+    step = 2 * np.pi / levels
+    indices = np.mod(np.round(phases / step), levels).astype(int)
+    return indices * step
+
+
+def _generate_hadamard_phases(K: int, N: int) -> np.ndarray:
+    size = 2 ** math.ceil(math.log2(max(K, N)))
+    matrix = hadamard(size)
+    phases = np.where(matrix[:K, :N] > 0, 0.0, np.pi)
+    return phases.astype(np.float32)
+
+
+def generate_probe_bank(
+    N: int,
+    K: int,
+    seed: Optional[int] = None,
+    phase_mode: str = "continuous",
+    phase_bits: int = 3,
+    probe_bank_mode: str = "random",
+    qmc_scramble: bool = True
+) -> ProbeBank:
     """
     Generate a fixed probe bank with random phase configurations.
     
@@ -35,6 +60,10 @@ def generate_probe_bank(N: int, K: int, seed: Optional[int] = None) -> ProbeBank
         N: Number of RIS elements
         K: Number of probes
         seed: Random seed for reproducibility
+        phase_mode: "continuous" or "discrete" phase configuration
+        phase_bits: Number of bits for discrete phase quantization
+        probe_bank_mode: "random", "hadamard", "sobol", or "halton"
+        qmc_scramble: Whether to scramble Sobol/Halton sequences
         
     Returns:
         ProbeBank object containing K phase configurations
@@ -44,8 +73,23 @@ def generate_probe_bank(N: int, K: int, seed: Optional[int] = None) -> ProbeBank
     else:
         rng = np.random.RandomState()
     
-    # Generate random phases uniformly in [0, 2π)
-    phases = rng.uniform(0, 2 * np.pi, size=(K, N))
+    if probe_bank_mode == "random":
+        phases = rng.uniform(0, 2 * np.pi, size=(K, N))
+    elif probe_bank_mode == "hadamard":
+        phases = _generate_hadamard_phases(K, N)
+    elif probe_bank_mode in {"sobol", "halton"}:
+        if probe_bank_mode == "sobol":
+            sampler = qmc.Sobol(d=N, scramble=qmc_scramble, seed=seed)
+        else:
+            sampler = qmc.Halton(d=N, scramble=qmc_scramble, seed=seed)
+        phases = sampler.random(n=K) * (2 * np.pi)
+    else:
+        raise ValueError("probe_bank_mode must be 'random', 'hadamard', 'sobol', or 'halton'")
+
+    if phase_mode == "discrete":
+        if phase_bits <= 0:
+            raise ValueError("phase_bits must be > 0 for discrete phase mode")
+        phases = _quantize_phases(phases, phase_bits)
     
     return ProbeBank(phases=phases, K=K, N=N)
 
