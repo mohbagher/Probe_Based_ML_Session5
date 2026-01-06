@@ -10,6 +10,7 @@ Supports:
 
 import numpy as np
 from scipy.linalg import hadamard
+from scipy.stats import qmc
 from dataclasses import dataclass
 from typing import Optional
 
@@ -20,7 +21,7 @@ class ProbeBank:
     phases: np.ndarray          # Shape: (K, N), phase values in [0, 2π)
     K: int                      # Number of probes
     N: int                      # Number of RIS elements
-    probe_type: str = "continuous"  # Type of probe: continuous, binary, 2bit, hadamard
+    probe_type: str = "continuous"  # Type of probe: continuous, binary, 2bit, hadamard, sobol, halton
     
     def get_reflection_coefficients(self) -> np.ndarray:
         """Return complex reflection coefficients exp(j*θ)."""
@@ -140,12 +141,48 @@ def generate_probe_bank_hadamard(N: int, K: int) -> ProbeBank:
     return ProbeBank(phases=phases, K=K, N=N, probe_type="hadamard")
 
 
+def generate_probe_bank_sobol(N: int, K: int, seed: Optional[int] = None) -> ProbeBank:
+    """
+    Generate probe bank using Sobol low-discrepancy sequences.
+
+    Args:
+        N: Number of RIS elements
+        K: Number of probes
+        seed: Random seed for reproducibility
+
+    Returns:
+        ProbeBank with Sobol phases in [0, 2π)
+    """
+    sampler = qmc.Sobol(d=N, scramble=False, seed=seed)
+    samples = sampler.random(n=K)
+    phases = samples * (2 * np.pi)
+    return ProbeBank(phases=phases, K=K, N=N, probe_type="sobol")
+
+
+def generate_probe_bank_halton(N: int, K: int, seed: Optional[int] = None) -> ProbeBank:
+    """
+    Generate probe bank using Halton low-discrepancy sequences.
+
+    Args:
+        N: Number of RIS elements
+        K: Number of probes
+        seed: Random seed for reproducibility
+
+    Returns:
+        ProbeBank with Halton phases in [0, 2π)
+    """
+    sampler = qmc.Halton(d=N, scramble=False, seed=seed)
+    samples = sampler.random(n=K)
+    phases = samples * (2 * np.pi)
+    return ProbeBank(phases=phases, K=K, N=N, probe_type="halton")
+
+
 def get_probe_bank(probe_type: str, N: int, K: int, seed: Optional[int] = None) -> ProbeBank:
     """
     Factory function to generate probe bank of specified type.
     
     Args:
-        probe_type: Type of probe ("continuous", "binary", "2bit", "hadamard")
+        probe_type: Type of probe ("continuous", "binary", "2bit", "hadamard", "sobol", "halton")
         N: Number of RIS elements
         K: Number of probes
         seed: Random seed (not used for Hadamard)
@@ -163,6 +200,10 @@ def get_probe_bank(probe_type: str, N: int, K: int, seed: Optional[int] = None) 
         return generate_probe_bank_2bit(N, K, seed)
     elif probe_type == "hadamard":
         return generate_probe_bank_hadamard(N, K)
+    elif probe_type == "sobol":
+        return generate_probe_bank_sobol(N, K, seed)
+    elif probe_type == "halton":
+        return generate_probe_bank_halton(N, K, seed)
     else:
         raise ValueError(f"Unknown probe type: {probe_type}. "
-                        f"Must be one of: continuous, binary, 2bit, hadamard")
+                        f"Must be one of: continuous, binary, 2bit, hadamard, sobol, halton")
