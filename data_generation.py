@@ -7,10 +7,13 @@ Key change from baseline:
 """
 
 import numpy as np
+import math
 from typing import Tuple, Dict, Optional
 from dataclasses import dataclass
 import torch
 from torch.utils.data import Dataset, DataLoader
+from scipy.stats import qmc
+from scipy.linalg import hadamard
 
 from config import Config, SystemConfig, DataConfig
 
