@@ -15,7 +15,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from experiments.probe_generators import get_probe_bank
-from config import get_config
+from experiments.tasks.task_defaults import build_task_config
 from data_generation import create_dataloaders
 from model import create_model
 from training import train
@@ -49,11 +49,7 @@ def run_task_b3(N: int = 32, K: int = 64, M: int = 8, seed: int = 42,
     os.makedirs(plots_dir, exist_ok=True)
     
     # Create config and train model
-    config = get_config(
-        system={'N': N, 'K': K, 'M': M},
-        data={'n_train': 30000, 'n_val': 3000, 'n_test': 3000, 'seed': seed},
-        training={'num_epochs': 80}
-    )
+    config = build_task_config(N, K, M, seed)
     
     probe_bank = get_probe_bank('continuous', N, K, seed)
     
