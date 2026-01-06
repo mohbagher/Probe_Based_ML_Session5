@@ -71,17 +71,17 @@ Successfully implemented a complete experiment framework for RIS probe-based ML 
 - Reports improvement percentages
 - Outputs: 1 plot + metrics.txt
 
-#### Phases C, D, E: Scaling and Quality Control ✅
+#### Phases C, D, E: Placeholder Implementations ✅
 
-Implemented:
-- **C1**: Scale K study (η vs K and η vs M/K)
-- **C2**: Phase resolution comparison (η vs M and η vs control bits)
-- **D1**: Seed variation analysis (η boxplot + mean/std)
-- **D2**: Sanity checks (training curves + metric flags)
-
-Placeholders remain for:
+Created placeholder implementations for:
+- **C1**: Scale K study
+- **C2**: Phase resolution comparison
+- **D1**: Seed variation analysis
+- **D2**: Sanity checks
 - **E1**: One-page summary
 - **E2**: Master comparison plots
+
+These can be easily expanded following the existing pattern.
 
 ### 3. Interactive Framework ✅
 
@@ -99,7 +99,6 @@ Placeholders remain for:
 - Custom parameters: `--N 64 --K 128 --M 16 --seed 123`
 - Interactive mode: No arguments needed
 - Auto-advance: waits 5 seconds between sequential tasks (press Enter to skip)
-- Standardized training defaults across tasks (same data sizes/epochs for fair comparison)
 
 ### 4. Documentation ✅
 
@@ -138,10 +137,10 @@ experiments/
     ├── task_b1_m_variation.py     # ✅ Fully implemented
     ├── task_b2_top_m.py           # ✅ Fully implemented
     ├── task_b3_baselines.py       # ✅ Fully implemented
-    ├── task_c1_scale_k.py         # ✅ Fully implemented
-    ├── task_c2_phase_resolution.py # ✅ Fully implemented
-    ├── task_d1_seed_variation.py  # ✅ Fully implemented
-    ├── task_d2_sanity_checks.py   # ✅ Fully implemented
+    ├── task_c1_scale_k.py         # 📝 Placeholder
+    ├── task_c2_phase_resolution.py # 📝 Placeholder
+    ├── task_d1_seed_variation.py  # 📝 Placeholder
+    ├── task_d2_sanity_checks.py   # 📝 Placeholder
     ├── task_e1_summary.py         # 📝 Placeholder
     └── task_e2_comparison_plots.py # 📝 Placeholder
 
@@ -175,14 +174,12 @@ results/
 ├── A4_sobol_probes/
 │   ├── plots/
 │   │   ├── phase_heatmap.png
-│   │   ├── phase_histogram.png
-│   │   └── pairwise_similarity.png
+│   │   └── phase_histogram.png
 │   └── metrics.txt
 ├── A5_halton_probes/
 │   ├── plots/
 │   │   ├── phase_heatmap.png
-│   │   ├── phase_histogram.png
-│   │   └── pairwise_similarity.png
+│   │   └── phase_histogram.png
 │   └── metrics.txt
 ... (similar structure for all tasks)
 ```
@@ -262,7 +259,7 @@ All other dependencies were already present.
 
 ## Future Work (Optional Enhancements)
 
-The placeholder tasks (E1, E2) can be implemented following the same pattern:
+The placeholder tasks (C1, C2, D1, D2, E1, E2) can be implemented following the same pattern:
 
 1. Create function with signature: `run_task_XX(N, K, M, seed, results_dir, verbose)`
 2. Generate data/train models as needed
@@ -274,7 +271,7 @@ The placeholder tasks (E1, E2) can be implemented following the same pattern:
 
 ✅ **Fully functional experiment framework**
 ✅ **6 complete tasks (A1-A3, B1-B3)**
-✅ **2 placeholder tasks (E1-E2) ready for expansion**
+✅ **6 placeholder tasks (C1-E2) ready for expansion**
 ✅ **Interactive + CLI interfaces**
 ✅ **Comprehensive documentation**
 ✅ **Tested and verified**
@@ -285,10 +282,10 @@ The framework is production-ready and can be used immediately for systematic res
 - Generates Sobol low-discrepancy probes
 - Creates phase heatmaps and histograms
 - Computes diversity metrics
-- Outputs: 3 plots + metrics.txt
+- Outputs: 2 plots + metrics.txt
 
 **Task A5 - Halton Probes** (`task_a5_halton.py`)
 - Generates Halton low-discrepancy probes
 - Creates phase heatmaps and histograms
 - Computes diversity metrics
-- Outputs: 3 plots + metrics.txt
+- Outputs: 2 plots + metrics.txt

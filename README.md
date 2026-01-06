@@ -67,7 +67,6 @@ This opens an interactive menu where you can:
 - Custom task selection (99)
 
 When running multiple tasks in sequence, the runner waits 5 seconds between tasks (press Enter to skip the wait).
-Training tasks use standardized default data sizes and epochs so comparisons are fair across tasks.
 
 ### Option 2: Command Line
 

@@ -14,7 +14,7 @@ import numpy as np
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
-from experiments.tasks.task_defaults import build_task_config
+from config import get_config
 from data_generation import create_dataloaders
 from evaluation import evaluate_model
 from experiments.probe_generators import get_probe_bank
@@ -54,7 +54,11 @@ def run_task_d1(N: int = 32, K: int = 64, M: int = 8, seed: int = 42,
         if verbose:
             print(f"\n--- Seed = {run_seed} ---")
 
-        config = build_task_config(N, K, M, run_seed)
+        config = get_config(
+            system={'N': N, 'K': K, 'M': M},
+            data={'n_train': 20000, 'n_val': 2000, 'n_test': 2000, 'seed': run_seed},
+            training={'num_epochs': 50, 'batch_size': 128}
+        )
 
         probe_bank = get_probe_bank('continuous', N, K, run_seed)
         train_loader, val_loader, test_loader, metadata = create_dataloaders(config, probe_bank)
