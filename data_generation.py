@@ -27,7 +27,13 @@ class ProbeBank:
         return np.exp(1j * self.phases)
 
 
-def generate_probe_bank(N: int, K: int, seed: Optional[int] = None) -> ProbeBank:
+def generate_probe_bank(
+    N: int,
+    K: int,
+    seed: Optional[int] = None,
+    phase_mode: str = "continuous",
+    phase_bits: int = 3
+) -> ProbeBank:
     """
     Generate a fixed probe bank with random phase configurations.
     
@@ -35,6 +41,8 @@ def generate_probe_bank(N: int, K: int, seed: Optional[int] = None) -> ProbeBank
         N: Number of RIS elements
         K: Number of probes
         seed: Random seed for reproducibility
+        phase_mode: "continuous" or "discrete" phase configuration
+        phase_bits: Number of bits for discrete phase quantization
         
     Returns:
         ProbeBank object containing K phase configurations
@@ -44,8 +52,15 @@ def generate_probe_bank(N: int, K: int, seed: Optional[int] = None) -> ProbeBank
     else:
         rng = np.random.RandomState()
     
-    # Generate random phases uniformly in [0, 2π)
-    phases = rng.uniform(0, 2 * np.pi, size=(K, N))
+    if phase_mode == "continuous":
+        phases = rng.uniform(0, 2 * np.pi, size=(K, N))
+    elif phase_mode == "discrete":
+        if phase_bits <= 0:
+            raise ValueError("phase_bits must be > 0 for discrete phase mode")
+        levels = 2 ** phase_bits
+        phases = rng.randint(0, levels, size=(K, N)) * (2 * np.pi / levels)
+    else:
+        raise ValueError("phase_mode must be 'continuous' or 'discrete'")
     
     return ProbeBank(phases=phases, K=K, N=N)
 
