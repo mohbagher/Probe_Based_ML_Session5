@@ -35,7 +35,7 @@ class DataConfig:
 @dataclass
 class ModelConfig:
     """MLP architecture parameters."""
-    hidden_sizes: List[int] = field(default_factory=lambda:  [512, 256, 128])
+    hidden_sizes: List[int] = field(default_factory=lambda: [512, 256, 128])
     dropout_prob: float = 0.1
     use_batch_norm: bool = True
 
@@ -45,9 +45,9 @@ class TrainingConfig:
     """Training hyperparameters."""
     batch_size: int = 128
     learning_rate: float = 1e-3
-    weight_decay: float = 1e-5
-    num_epochs: int = 100
-    early_stopping_patience: int = 15
+    weight_decay: float = 1e-4
+    n_epochs: int = 50
+    early_stop_patience: int = 10
     eval_interval: int = 1
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -59,14 +59,14 @@ class EvalConfig:
 
 
 @dataclass
-class Config: 
+class Config:
     """Master configuration combining all sub-configs."""
     system: SystemConfig = field(default_factory=SystemConfig)
     data: DataConfig = field(default_factory=DataConfig)
     model: ModelConfig = field(default_factory=ModelConfig)
     training: TrainingConfig = field(default_factory=TrainingConfig)
     eval: EvalConfig = field(default_factory=EvalConfig)
-    
+
     def __post_init__(self):
         # Ensure top_m values don't exceed K
         self.eval.top_m_values = [m for m in self.eval.top_m_values if m <= self.system.K]
@@ -80,13 +80,13 @@ class Config:
             raise ValueError("phase_bits must be > 0 when phase_mode is 'discrete'")
         if self.system.probe_bank_method not in {"random", "hadamard", "sobol", "halton"}:
             raise ValueError("probe_bank_method must be one of: random, hadamard, sobol, halton")
-    
+
     def print_config(self):
         """Print configuration summary."""
         print("\n" + "=" * 60)
         print("CONFIGURATION")
         print("=" * 60)
-        print(f"\nSystem:")
+        print("\nSystem:")
         print(f"  N (RIS elements):     {self.system.N}")
         print(f"  K (total probes):     {self.system.K}")
         print(f"  M (sensing budget):   {self.system.M}")
@@ -95,15 +95,18 @@ class Config:
         if self.system.phase_mode == "discrete":
             print(f"  Phase bits:           {self.system.phase_bits}")
         print(f"  Probe bank method:    {self.system.probe_bank_method}")
-        print(f"\nData:")
+
+        print("\nData:")
         print(f"  Training samples:     {self.data.n_train}")
         print(f"  Validation samples:   {self.data.n_val}")
         print(f"  Test samples:          {self.data.n_test}")
-        print(f"\nModel:")
+
+        print("\nModel:")
         print(f"  Input size:           {2 * self.system.K} (masked vector)")
         print(f"  Hidden layers:        {self.model.hidden_sizes}")
         print(f"  Output size:          {self.system.K}")
-        print(f"\nTraining:")
+
+        print("\nTraining:")
         print(f"  Batch size:           {self.training.batch_size}")
         print(f"  Learning rate:        {self.training.learning_rate}")
         print(f"  Device:               {self.training.device}")
@@ -113,20 +116,20 @@ class Config:
 def get_config(**kwargs) -> Config:
     """
     Create configuration with optional overrides.
-    
+
     Example:
         config = get_config(system={'N': 64, 'K': 128, 'M': 16})
     """
     config = Config()
-    
+
     for key, value in kwargs.items():
         if hasattr(config, key) and isinstance(value, dict):
             sub_config = getattr(config, key)
             for sub_key, sub_value in value.items():
                 if hasattr(sub_config, sub_key):
                     setattr(sub_config, sub_key, sub_value)
-    
+
     # Re-run post_init validation
     config.__post_init__()
-    
+
     return config
