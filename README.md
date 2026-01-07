@@ -54,7 +54,28 @@ pip install -r requirements.txt
 
 ## 🚀 Quick Start
 
-### Option 1: Interactive Menu (Recommended)
+### Option 1: Using the New Experiment Toolkit (Recommended)
+
+```python
+from experiment_toolkit import ConfigBuilder, ExperimentRunner, PlotGallery
+
+# Fluent API for configuration
+config = (ConfigBuilder()
+    .system(N=32, K=64, M=8, probe_type='continuous')
+    .data(n_train=50000, n_val=5000, n_test=5000, seed=42)
+    .model_by_name('Baseline_MLP')  # Use pre-defined architecture
+    .training(epochs=50, batch_size=128, lr=1e-3)
+    .build())
+
+# Run complete experiment
+experiment = ExperimentRunner.run(config, verbose=True)
+
+# Generate plots
+PlotGallery.show('cdf', experiment['results'])
+PlotGallery.show(['eta_distribution', 'training_curves'], experiment['results'], experiment['history'])
+```
+
+### Option 2: Interactive Menu
 
 ```bash
 python experiment_runner.py
@@ -68,7 +89,7 @@ This opens an interactive menu where you can:
 
 When running multiple tasks in sequence, the runner waits 5 seconds between tasks (press Enter to skip the wait).
 
-### Option 2: Command Line
+### Option 3: Command Line
 
 ```bash
 # Run specific tasks
@@ -81,7 +102,7 @@ python experiment_runner.py --task 0
 python experiment_runner.py --task 6 --N 64 --K 128 --M 16 --seed 42
 ```
 
-### Option 3: Python API
+### Option 4: Python API
 
 ```python
 from experiments.tasks.task_a1_binary import run_task_a1
@@ -94,7 +115,7 @@ result = run_task_a1(N=32, K=64, M=8, seed=42)
 result = run_task_b1(N=32, K=64, M=8, seed=42)
 ```
 
-### Option 4: Original Training Script
+### Option 5: Original Training Script
 
 ```bash
 python main.py --N 32 --K 64 --M 8 --epochs 100
@@ -162,6 +183,9 @@ Probe_Based_ML_Session5/
 │
 ├── config.py                 # Configuration dataclasses
 ├── model.py                  # MLP neural network architecture
+├── model_registry.py         # 🆕 Model architecture registry
+├── plot_registry.py          # 🆕 Centralized plotting functions
+├── experiment_toolkit.py     # 🆕 High-level experiment API
 ├── training.py               # Training loop with early stopping
 ├── evaluation.py             # Metrics computation & baselines
 ├── data_generation.py        # Channel simulation & datasets
@@ -194,6 +218,115 @@ Probe_Based_ML_Session5/
 ├── LICENSE                   # MIT License
 └── README.md                 # This file
 ```
+
+## 🆕 New Features: Registry System
+
+### Model Registry
+
+The framework now includes a centralized model architecture registry for easy extension:
+
+```python
+from model_registry import list_models, get_model_architecture, register_model
+
+# List available models
+models = list_models()  
+# ['Baseline_MLP', 'Deep_MLP', 'Tiny_MLP', 'Ultra_Deep', 'Wide_Deep', ...]
+
+# Get a model architecture
+arch = get_model_architecture('Baseline_MLP')  # Returns [256, 128]
+
+# Register your own custom model
+register_model('My_Custom_MLP', [512, 256, 128, 64])
+```
+
+**Pre-defined Models:**
+- **Baseline_MLP**: [256, 128] - Standard model
+- **Deep_MLP**: [512, 512, 256] - High capacity
+- **Tiny_MLP**: [64, 32] - Lightweight
+- **Ultra_Deep**: [1024, 512, 256, 128, 64] - Very deep
+- **Wide_Deep**: [1024, 1024, 512, 512] - Wide architecture
+- **Lightweight**: [128, 64] - Efficient
+- **Minimal**: [32, 16] - Minimal capacity
+- **Experimental_A**: [512, 256, 256, 128] - Research model
+- **Experimental_B**: [768, 384, 192, 96] - Research model
+
+### Plot Registry
+
+Unified interface to all visualization functions:
+
+```python
+from plot_registry import list_plots, get_plot_function
+
+# List available plot types
+plots = list_plots()
+# ['training_curves', 'eta_distribution', 'cdf', 'violin', 'heatmap', ...]
+
+# Use a plot function
+plot_func = get_plot_function('cdf')
+plot_func(results, save_path='my_cdf.png')
+```
+
+**Available Plots:**
+- `training_curves` - Training history visualization
+- `eta_distribution` - Performance distribution
+- `top_m_comparison` - Top-m accuracy comparison
+- `baseline_comparison` - ML vs baselines
+- `cdf` - Cumulative distribution function
+- `violin` - Violin plot for multiple models
+- `heatmap` - Probe phase heatmap
+- `scatter` - Scatter comparison plot
+- `box` - Box plot comparison
+- `correlation_matrix` - Probe similarity matrix
+
+### Experiment Toolkit
+
+High-level fluent API for running experiments:
+
+```python
+from experiment_toolkit import ConfigBuilder, ExperimentRunner, PlotGallery
+
+# Build configuration with fluent interface
+config = (ConfigBuilder()
+    .system(N=32, K=64, M=8, probe_type='hadamard')
+    .data(n_train=50000, seed=42)
+    .model_by_name('Deep_MLP')
+    .training(epochs=50, batch_size=128)
+    .build())
+
+# Run experiment
+results = ExperimentRunner.run(config, verbose=True)
+
+# Compare multiple models
+results = ExperimentRunner.compare_models(
+    config_base=config,
+    model_names=['Baseline_MLP', 'Deep_MLP', 'Tiny_MLP']
+)
+
+# Show plots
+PlotGallery.show(['cdf', 'heatmap'], results)
+PlotGallery.show('violin', results_dict)
+```
+
+## ⚠️ Important Changes
+
+### Deprecated Parameters
+
+- **`probe_bank_method`** in `SystemConfig` is deprecated. Use **`probe_type`** instead.
+  - Old: `system={'probe_bank_method': 'hadamard'}`
+  - New: `system={'probe_type': 'hadamard'}`
+  - The old parameter still works with a deprecation warning for backward compatibility.
+
+### Parameter Naming Standardization
+
+- Training configuration now uses **`n_epochs`** instead of `num_epochs`
+  - Old: `training={'num_epochs': 50}`
+  - New: `training={'n_epochs': 50}`
+
+### ProbeBank Import Location
+
+- `ProbeBank` class is now only in `experiments.probe_generators`
+  - Import: `from experiments.probe_generators import ProbeBank, get_probe_bank`
+  - The duplicate definition in `data_generation.py` has been removed
 
 ## 📈 Results Structure
 
