@@ -179,7 +179,7 @@ def train(model: nn.Module,
     )
     
     early_stopping = EarlyStopping(
-        patience=config.training.early_stopping_patience,
+        patience=config.training.early_stop_patience,
         mode='max'
     )
     
@@ -190,7 +190,7 @@ def train(model: nn.Module,
     print(f"Sensing budget: M={config.system.M} out of K={config.system.K} probes")
     print("-" * 70)
     
-    for epoch in range(config.training.num_epochs):
+    for epoch in range(config.training.n_epochs):
         train_loss, train_acc = train_one_epoch(
             model, train_loader, criterion, optimizer, device
         )
@@ -205,7 +205,7 @@ def train(model: nn.Module,
         history.add_epoch(train_loss, val_loss, train_acc, val_acc, val_eta, current_lr)
         
         if (epoch + 1) % config.training.eval_interval == 0:
-            print(f"Epoch {epoch+1:3d}/{config.training.num_epochs} | "
+            print(f"Epoch {epoch+1:3d}/{config.training.n_epochs} | "
                   f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.4f} | "
                   f"Val Loss: {val_loss:.4f} | Val Acc: {val_acc:.4f} | "
                   f"Val η: {val_eta:.4f}")
