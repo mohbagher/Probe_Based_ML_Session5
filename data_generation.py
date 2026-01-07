@@ -7,6 +7,8 @@ Key change from baseline:
 """
 
 import numpy as np
+from scipy import linalg
+from scipy.stats import qmc
 from typing import Tuple, Dict, Optional
 from dataclasses import dataclass
 import torch
@@ -27,7 +29,14 @@ class ProbeBank:
         return np.exp(1j * self.phases)
 
 
-def generate_probe_bank(N: int, K: int, seed: Optional[int] = None) -> ProbeBank:
+def generate_probe_bank(
+    N: int,
+    K: int,
+    seed: Optional[int] = None,
+    phase_mode: str = "continuous",
+    phase_bits: int = 3,
+    probe_bank_method: str = "random"
+) -> ProbeBank:
     """
     Generate a fixed probe bank with random phase configurations.
     
@@ -35,6 +44,9 @@ def generate_probe_bank(N: int, K: int, seed: Optional[int] = None) -> ProbeBank
         N: Number of RIS elements
         K: Number of probes
         seed: Random seed for reproducibility
+        phase_mode: "continuous" or "discrete" phase configuration
+        phase_bits: Number of bits for discrete phase quantization
+        probe_bank_method: "random", "hadamard", "sobol", or "halton"
         
     Returns:
         ProbeBank object containing K phase configurations
@@ -44,8 +56,31 @@ def generate_probe_bank(N: int, K: int, seed: Optional[int] = None) -> ProbeBank
     else:
         rng = np.random.RandomState()
     
-    # Generate random phases uniformly in [0, 2π)
-    phases = rng.uniform(0, 2 * np.pi, size=(K, N))
+    if probe_bank_method == "random":
+        phases = rng.uniform(0, 2 * np.pi, size=(K, N))
+    elif probe_bank_method == "hadamard":
+        size = 1
+        while size < max(K, N):
+            size *= 2
+        hadamard_matrix = linalg.hadamard(size)
+        phases = np.where(hadamard_matrix[:K, :N] > 0, 0.0, np.pi)
+    elif probe_bank_method == "sobol":
+        sampler = qmc.Sobol(d=N, scramble=True, seed=seed)
+        phases = sampler.random(n=K) * (2 * np.pi)
+    elif probe_bank_method == "halton":
+        sampler = qmc.Halton(d=N, scramble=True, seed=seed)
+        phases = sampler.random(n=K) * (2 * np.pi)
+    else:
+        raise ValueError("probe_bank_method must be 'random', 'hadamard', 'sobol', or 'halton'")
+
+    if phase_mode == "discrete":
+        if phase_bits <= 0:
+            raise ValueError("phase_bits must be > 0 for discrete phase mode")
+        levels = 2 ** phase_bits
+        phases = np.round(phases / (2 * np.pi) * levels) % levels
+        phases = phases * (2 * np.pi / levels)
+    elif phase_mode != "continuous":
+        raise ValueError("phase_mode must be 'continuous' or 'discrete'")
     
     return ProbeBank(phases=phases, K=K, N=N)
 
