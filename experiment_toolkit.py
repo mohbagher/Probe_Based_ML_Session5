@@ -5,7 +5,6 @@ Provides clean, fluent interface for configuring and running experiments.
 """
 
 from typing import Dict, List, Optional, Union
-from dataclasses import dataclass
 import numpy as np
 
 from config import Config, get_config
@@ -148,11 +147,9 @@ class ExperimentRunner:
                 print(f"Training: {model_name}")
                 print('='*70)
             
-            # Clone config and update model
-            config = ConfigBuilder().build()
-            config.system = config_base.system
-            config.data = config_base.data
-            config.training = config_base.training
+            # Create a new config based on config_base but with different model architecture
+            from copy import deepcopy
+            config = deepcopy(config_base)
             config.model.hidden_sizes = get_model_architecture(model_name)
             
             result = ExperimentRunner.run(config, verbose=verbose)
