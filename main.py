@@ -44,8 +44,7 @@ def run_experiment(config: Config, verbose: bool = True) -> dict:
         K=config.system.K,
         seed=config.data.seed,
         phase_mode=config.system.phase_mode,
-        phase_bits=config.system.phase_bits,
-        probe_bank_method=config.system.probe_bank_method
+        phase_bits=config.system.phase_bits
     )
     
     if verbose:
@@ -53,7 +52,6 @@ def run_experiment(config: Config, verbose: bool = True) -> dict:
         print(f"  Each probe has {config.system.N} phase values in [0, 2π)")
         if config.system.phase_mode == "discrete":
             print(f"  Phase quantization: {config.system.phase_bits} bits")
-        print(f"  Probe bank method: {config.system.probe_bank_method}")
         print(f"  Probe bank shape: {probe_bank.phases.shape}")
     
     # Step 2: Create datasets with limited probing
@@ -169,9 +167,6 @@ def main():
                         help='Phase configuration mode')
     parser.add_argument('--phase_bits', type=int, default=3,
                         help='Phase quantization bits (discrete mode only)')
-    parser.add_argument('--probe_bank_method', type=str, default='random',
-                        choices=['random', 'hadamard', 'sobol', 'halton'],
-                        help='Probe bank generation method')
     
     # Data parameters
     parser.add_argument('--n_train', type=int, default=50000,
@@ -216,8 +211,7 @@ def main():
             'K': args.K,
             'M': args.M,
             'phase_mode': args.phase_mode,
-            'phase_bits': args.phase_bits,
-            'probe_bank_method': args.probe_bank_method
+            'phase_bits': args.phase_bits
         },
         data={
             'n_train': args.n_train,

@@ -18,7 +18,6 @@ class SystemConfig:
     sigma_g_sq: float = 1.0        # RIS-UE channel variance
     phase_mode: str = "continuous"  # "continuous" or "discrete"
     phase_bits: int = 3            # Bits for discrete phase quantization
-    probe_bank_method: str = "random"  # "random", "hadamard", "sobol", "halton"
 
 
 @dataclass
@@ -78,8 +77,6 @@ class Config:
             raise ValueError("phase_mode must be 'continuous' or 'discrete'")
         if self.system.phase_mode == "discrete" and self.system.phase_bits <= 0:
             raise ValueError("phase_bits must be > 0 when phase_mode is 'discrete'")
-        if self.system.probe_bank_method not in {"random", "hadamard", "sobol", "halton"}:
-            raise ValueError("probe_bank_method must be one of: random, hadamard, sobol, halton")
     
     def print_config(self):
         """Print configuration summary."""
@@ -94,7 +91,6 @@ class Config:
         print(f"  Phase mode:           {self.system.phase_mode}")
         if self.system.phase_mode == "discrete":
             print(f"  Phase bits:           {self.system.phase_bits}")
-        print(f"  Probe bank method:    {self.system.probe_bank_method}")
         print(f"\nData:")
         print(f"  Training samples:     {self.data.n_train}")
         print(f"  Validation samples:   {self.data.n_val}")
