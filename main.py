@@ -8,7 +8,8 @@ import argparse
 import os
 
 from config import Config, get_config
-from data_generation import generate_probe_bank, create_dataloaders
+from data_generation import create_dataloaders
+from experiments.probe_generators import get_probe_bank
 from model import create_model, count_parameters
 from training import train
 from evaluation import evaluate_model, compute_baselines_only
@@ -39,19 +40,21 @@ def run_experiment(config: Config, verbose: bool = True) -> dict:
         print("STEP 1: Generating fixed probe bank")
         print("=" * 70)
     
-    probe_bank = generate_probe_bank(
+    # Determine probe type (for backward compatibility)
+    probe_type = getattr(config.system, 'probe_type', 'continuous')
+    if not probe_type or probe_type == 'random':
+        probe_type = 'continuous'
+    
+    probe_bank = get_probe_bank(
+        probe_type=probe_type,
         N=config.system.N,
         K=config.system.K,
-        seed=config.data.seed,
-        phase_mode=config.system.phase_mode,
-        phase_bits=config.system.phase_bits
+        seed=config.data.seed
     )
     
     if verbose:
-        print(f"  Created {config.system.K} random phase configurations")
+        print(f"  Created {config.system.K} {probe_type} phase configurations")
         print(f"  Each probe has {config.system.N} phase values in [0, 2π)")
-        if config.system.phase_mode == "discrete":
-            print(f"  Phase quantization: {config.system.phase_bits} bits")
         print(f"  Probe bank shape: {probe_bank.phases.shape}")
     
     # Step 2: Create datasets with limited probing
@@ -220,7 +223,7 @@ def main():
             'seed': args.seed
         },
         training={
-            'num_epochs': args.epochs,
+            'n_epochs': args.epochs,
             'batch_size': args.batch_size,
             'learning_rate': args.lr
         },

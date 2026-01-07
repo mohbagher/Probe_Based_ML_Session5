@@ -18,7 +18,25 @@ class SystemConfig:
     sigma_g_sq: float = 1.0        # RIS-UE channel variance
     phase_mode: str = "continuous"  # "continuous" or "discrete"
     phase_bits: int = 3            # Bits for discrete phase quantization
-    probe_bank_method: str = "random"  # "random", "hadamard", "sobol", "halton"
+    probe_type: str = "continuous"  # Type of probe: "continuous", "binary", "2bit", "hadamard", "sobol", "halton"
+    probe_bank_method: Optional[str] = None  # DEPRECATED: Use probe_type instead
+    
+    def __post_init__(self):
+        """Handle backward compatibility for probe_bank_method."""
+        # Handle deprecated probe_bank_method
+        if self.probe_bank_method is not None:
+            import warnings
+            warnings.warn(
+                "probe_bank_method is deprecated and will be removed in a future version. "
+                "Use probe_type instead.",
+                DeprecationWarning,
+                stacklevel=2
+            )
+            # Map old values to new ones
+            if self.probe_bank_method == "random":
+                self.probe_type = "continuous"
+            else:
+                self.probe_type = self.probe_bank_method
 
 
 @dataclass
@@ -68,6 +86,10 @@ class Config:
     eval: EvalConfig = field(default_factory=EvalConfig)
 
     def __post_init__(self):
+        # Run SystemConfig's __post_init__ for backward compatibility
+        if hasattr(self.system, '__post_init__'):
+            self.system.__post_init__()
+        
         # Ensure top_m values don't exceed K
         self.eval.top_m_values = [m for m in self.eval.top_m_values if m <= self.system.K]
         # Ensure M <= K
@@ -78,8 +100,10 @@ class Config:
             raise ValueError("phase_mode must be 'continuous' or 'discrete'")
         if self.system.phase_mode == "discrete" and self.system.phase_bits <= 0:
             raise ValueError("phase_bits must be > 0 when phase_mode is 'discrete'")
-        if self.system.probe_bank_method not in {"random", "hadamard", "sobol", "halton"}:
-            raise ValueError("probe_bank_method must be one of: random, hadamard, sobol, halton")
+        # Validate probe_type
+        valid_probe_types = {"continuous", "binary", "2bit", "hadamard", "sobol", "halton"}
+        if self.system.probe_type not in valid_probe_types:
+            raise ValueError(f"probe_type must be one of: {', '.join(valid_probe_types)}")
 
     def print_config(self):
         """Print configuration summary."""
@@ -94,7 +118,7 @@ class Config:
         print(f"  Phase mode:           {self.system.phase_mode}")
         if self.system.phase_mode == "discrete":
             print(f"  Phase bits:           {self.system.phase_bits}")
-        print(f"  Probe bank method:    {self.system.probe_bank_method}")
+        print(f"  Probe type:           {self.system.probe_type}")
 
         print("\nData:")
         print(f"  Training samples:     {self.data.n_train}")

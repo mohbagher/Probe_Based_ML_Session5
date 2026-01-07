@@ -14,7 +14,7 @@ DEFAULT_DATA = {
 }
 
 DEFAULT_TRAINING = {
-    'num_epochs': 50,
+    'n_epochs': 50,
     'batch_size': 128
 }
 

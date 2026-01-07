@@ -84,7 +84,7 @@ def run_task_c2(N: int = 32, K: int = 64, M: int = 8, seed: int = 42,
             config = get_config(
                 system={'N': N, 'K': K, 'M': M_test},
                 data={'n_train': 20000, 'n_val': 2000, 'n_test': 2000, 'seed': seed},
-                training={'num_epochs': 50, 'batch_size': 128}
+                training={'n_epochs': 50, 'batch_size': 128}
             )
 
             probe_bank = get_probe_bank(probe_type, N, K, seed)

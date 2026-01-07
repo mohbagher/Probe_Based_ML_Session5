@@ -16,56 +16,7 @@ from scipy.stats import qmc
 from scipy.linalg import hadamard
 
 from config import Config, SystemConfig, DataConfig
-
-
-@dataclass
-class ProbeBank:
-    """Fixed probe bank containing K phase configurations."""
-    phases: np.ndarray          # Shape: (K, N), phase values in [0, 2π)
-    K: int                      # Number of probes
-    N: int                      # Number of RIS elements
-    
-    def get_reflection_coefficients(self) -> np.ndarray:
-        """Return complex reflection coefficients exp(j*θ)."""
-        return np.exp(1j * self.phases)
-
-
-def generate_probe_bank(
-    N: int,
-    K: int,
-    seed: Optional[int] = None,
-    phase_mode: str = "continuous",
-    phase_bits: int = 3
-) -> ProbeBank:
-    """
-    Generate a fixed probe bank with random phase configurations.
-    
-    Args:
-        N: Number of RIS elements
-        K: Number of probes
-        seed: Random seed for reproducibility
-        phase_mode: "continuous" or "discrete" phase configuration
-        phase_bits: Number of bits for discrete phase quantization
-        
-    Returns:
-        ProbeBank object containing K phase configurations
-    """
-    if seed is not None:
-        rng = np.random.RandomState(seed)
-    else:
-        rng = np.random.RandomState()
-    
-    if phase_mode == "continuous":
-        phases = rng.uniform(0, 2 * np.pi, size=(K, N))
-    elif phase_mode == "discrete":
-        if phase_bits <= 0:
-            raise ValueError("phase_bits must be > 0 for discrete phase mode")
-        levels = 2 ** phase_bits
-        phases = rng.randint(0, levels, size=(K, N)) * (2 * np.pi / levels)
-    else:
-        raise ValueError("phase_mode must be 'continuous' or 'discrete'")
-    
-    return ProbeBank(phases=phases, K=K, N=N)
+from experiments.probe_generators import ProbeBank
 
 
 def generate_channel_realization(N: int,

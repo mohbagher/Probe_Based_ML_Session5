@@ -50,7 +50,7 @@ def run_task_d2(N: int = 32, K: int = 64, M: int = 8, seed: int = 42,
     config = get_config(
         system={'N': N, 'K': K, 'M': M},
         data={'n_train': 20000, 'n_val': 2000, 'n_test': 2000, 'seed': seed},
-        training={'num_epochs': 80, 'batch_size': 128}
+        training={'n_epochs': 80, 'batch_size': 128}
     )
 
     probe_bank = get_probe_bank('continuous', N, K, seed)

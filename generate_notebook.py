@@ -287,7 +287,7 @@ for model_name, hidden_layers in MODELS_TO_COMPARE.items():
     current_config.system.K = K
     current_config.system.M = M
     current_config.model.hidden_sizes = hidden_layers
-    current_config.training.num_epochs = EPOCHS
+    current_config.training.n_epochs = EPOCHS
     current_config.training.device = "cuda" if torch.cuda.is_available() else "cpu"
     
     # 2. Create & Train
