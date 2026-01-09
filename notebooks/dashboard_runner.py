@@ -24,7 +24,7 @@ if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
 from config import Config, SystemConfig, DataConfig, TrainingConfig, ModelConfig
-from data_generation import generate_dataset
+from data_generation import create_dataloaders
 from advanced_models import create_advanced_model
 from model import LimitedProbingMLP
 from evaluation import evaluate_model
@@ -234,12 +234,7 @@ def run_single_experiment(widgets_dict, model_type=None, seed=None):
     
     # Generate dataset
     print(f"Generating dataset (N={config.system.N}, K={config.system.K}, M={config.system.M})...")
-    train_dataset, val_dataset, test_dataset = generate_dataset(config, probe_bank)
-    
-    # Create data loaders
-    train_loader = DataLoader(train_dataset, batch_size=config.training.batch_size, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=config.training.batch_size, shuffle=False)
-    test_loader = DataLoader(test_dataset, batch_size=config.training.batch_size, shuffle=False)
+    train_loader, val_loader, test_loader, metadata = create_dataloaders(config, probe_bank)
     
     # Create model
     print(f"Creating {model_type} model...")
@@ -381,7 +376,20 @@ def run_single_experiment(widgets_dict, model_type=None, seed=None):
     
     # Evaluation
     print(f"\nEvaluating on test set...")
-    results = evaluate_model(model, test_loader, config, device)
+    
+    # Validate metadata has required keys
+    required_keys = ['test_powers_full', 'test_labels', 'test_observed_indices', 'test_optimal_powers']
+    missing_keys = [key for key in required_keys if key not in metadata]
+    if missing_keys:
+        raise KeyError(f"Metadata missing required keys: {missing_keys}")
+    
+    results = evaluate_model(
+        model, test_loader, config,
+        metadata['test_powers_full'],
+        metadata['test_labels'],
+        metadata['test_observed_indices'],
+        metadata['test_optimal_powers']
+    )
     results.print_summary()
     
     return {
