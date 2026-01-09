@@ -376,6 +376,13 @@ def run_single_experiment(widgets_dict, model_type=None, seed=None):
     
     # Evaluation
     print(f"\nEvaluating on test set...")
+    
+    # Validate metadata has required keys
+    required_keys = ['test_powers_full', 'test_labels', 'test_observed_indices', 'test_optimal_powers']
+    missing_keys = [key for key in required_keys if key not in metadata]
+    if missing_keys:
+        raise KeyError(f"Metadata missing required keys: {missing_keys}")
+    
     results = evaluate_model(
         model, test_loader, config,
         metadata['test_powers_full'],
